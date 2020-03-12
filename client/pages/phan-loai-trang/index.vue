@@ -119,11 +119,11 @@
 				return origin.length > 25 ? origin.slice(0,25)+'...' : origin;
 			},
 			async load_data(){
-				let {data} = await this.$axios.get('http://localhost:8080/api/save?limit=8&select=origin,url,createdAt&skip='+(8*(this.page - 1 )),{params:{where:this.condition}});
+				let {data} = await this.$axios.get('http://103.226.249.122:8080/api/save?limit=8&select=origin,url,createdAt&skip='+(8*(this.page - 1 )),{params:{where:this.condition}});
 				this.list_link = data;
 			},
 			async count(){
-				let {data} = await this.$axios.get('http://localhost:8080/api/save/count',{params:{condition:JSON.stringify(this.condition)}});
+				let {data} = await this.$axios.get('http://103.226.249.122:8080/api/save/count',{params:{condition:JSON.stringify(this.condition)}});
 				this.origins = data;
 				
 			},
@@ -132,7 +132,7 @@
 				await this.refresh();
 			},
 			async remove(row){
-				let {data} = await this.$axios.delete('http://localhost:8080/api/save/'+row.id);
+				let {data} = await this.$axios.delete('http://103.226.249.122:8080/api/save/'+row.id);
 				this.list_link = this.list_link.filter(e=>e.id !== data.id);
 				this.$message({message:'Đã xóa '+row.url.slice(0,40)+' ...',type:'warning'})
 			},

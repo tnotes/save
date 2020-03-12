@@ -114,7 +114,7 @@
 				this.loading = true;
 				for(let {url,cookie} of this.data){
 					this.running.push({url,cookie,status:1,id:null});
-					let {data} = await this.$axios.post('http://localhost:8080/api/save/add',{url,cookie});
+					let {data} = await this.$axios.post('http://103.226.249.122:8080/api/save/add',{url,cookie});
 					if(url.includes('facebook.com')){
 						let id_post = this.filter_facebook_link(url);
 						if(id_post) await this.facebook_post(id_post,cookie);
@@ -129,7 +129,7 @@
 				
 			},
 			async facebook_post(id_post,cookie){
-				await this.$axios.post('http://localhost:8080/api/post/info',{id_post,cookie})
+				await this.$axios.post('http://103.226.249.122:8080/api/post/info',{id_post,cookie})
 			},
 			filter_facebook_link(url){
 				

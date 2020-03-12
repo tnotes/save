@@ -50,7 +50,7 @@ module.exports = {
 
   },
 
-   port: 80,
+   port: 8080,
 
   // ssl: undefined,
 

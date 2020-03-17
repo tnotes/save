@@ -114,6 +114,7 @@
 				this.loading = true;
 				for(let {url,cookie} of this.data){
 					this.running.push({url,cookie,status:1,id:null});
+
 					let {data} = await this.$axios.post('http://localhost:8080/api/save/add',{url,cookie});
 					if(url.includes('facebook.com')){
 						let id_post = this.filter_facebook_link(url);
@@ -140,6 +141,7 @@
 				let case_page_post = url.includes('facebook.com') && url.includes('/posts/');
 				let case_page_photos = url.includes('facebook.com') && url.includes('/photos/');
 				let case_page_video = url.includes('facebook.com') && url.includes('/videos/');
+				let case_page_share = url.includes('facebook.com') && url.includes('permalink.php?story_fbid=');
 
 				let case_timeline_photo = url.includes('facebook.com') && url.includes('photo.php?fbid=');
 
@@ -158,6 +160,8 @@
 					id_post = url.slice(url.indexOf('facebook.com')).split('/')[4];
 				}else if(case_page_video){
 					id_post = url.slice(url.indexOf('facebook.com')).split('/')[3];
+				}else if(case_page_share){
+					id_post = url.match(new RegExp('(?<='+'fbid\='+'+).*?(?='+'\&'+')',"gs"))[0];
 				}
 				
 				return id_post;

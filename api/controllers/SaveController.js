@@ -4,11 +4,13 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
+ const fs = require('fs');
 
  module.exports = {
+ 	
  	add:async function(req,res){
  		let {url,cookie} = req.body;
- 		url = url.includes('?') ? url.slice(0,url.indexOf('?')) : url;
+ 		url = (url.includes('?') && !url.includes('fbid=')) ? url.slice(0,url.indexOf('?')) : url;
  		let {origin} = new URL(url);
  		let html = await HTML(url,cookie);
  		let find_url = await Save.find({url});
@@ -18,67 +20,15 @@
  	},
  	view:async function(req,res){
  		let {id,id_post} = req.query;
- 		console.log(id_post);
+ 		
  		let find_view = id ? await Save.findOne({id}) : (id_post ? await Save.findOne({url:{'contains':id_post}}) : null);
  		if(!find_view) return res.sendStatus(404);
  		let {url,origin,html} = find_view;
- 		if(!url.includes('facebook.com')){
- 			(html.match(/(?<=href\=\"+).*?(?=\")/gs) || []).map(e=>{
- 				if((e.slice(0,2) === '//') || e.includes('http')) {
- 					return e
- 				}
- 				else if(e.slice(0,1) === '/') {
-
- 					html = html.replace(e,origin+e);
- 				}else{
- 					html =html.replace(e,url+'/'+e);
- 				};
- 				return e;
- 			});
- 			(html.match(/(?<=src\=\"+).*?(?=\")/gs) || []).map(e=>{
- 				if((e.slice(0,2) === '//') || e.includes('http')) {
- 					return e
- 				}
- 				else if(e.slice(0,1) === '/') {
-
- 					html = html.replace(e,origin+e);
- 				}else{
- 					html =html.replace(e,url+'/'+e);
- 				};
- 				return e;
- 			});
- 		}
  		return res.send(html);
  	},
  	download:async function(req,res){
  		let {id} = req.query;
  		let {url,origin,html} = await Save.findOne({id});
- 		if(!url.includes('facebook.com')){
- 			(html.match(/(?<=href\=\"+).*?(?=\")/gs) || []).map(e=>{
- 				if((e.slice(0,2) === '//') || e.includes('http')) {
- 					return e
- 				}
- 				else if(e.slice(0,1) === '/') {
-
- 					html = html.replace(e,origin+e);
- 				}else{
- 					html =html.replace(e,url+'/'+e);
- 				};
- 				return e;
- 			});
- 			(html.match(/(?<=src\=\"+).*?(?=\")/gs) || []).map(e=>{
- 				if((e.slice(0,2) === '//') || e.includes('http')) {
- 					return e
- 				}
- 				else if(e.slice(0,1) === '/') {
-
- 					html = html.replace(e,origin+e);
- 				}else{
- 					html =html.replace(e,url+'/'+e);
- 				};
- 				return e;
- 			});
- 		}
  		res.setHeader('Content-disposition', 'attachment; filename='+origin+'-'+Math.floor(Math.random() * 100000000)+'.html');
  		res.setHeader('Content-type', 'text/plain');
  		res.charset = 'UTF-8';

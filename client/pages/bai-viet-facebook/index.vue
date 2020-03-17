@@ -41,7 +41,7 @@
 					<el-table-column label="Content" align="left" :sortable="false" :fixed="false" width="260">
 						<template slot-scope="scope">
 							<el-tooltip :content="'ID Post: '+scope.row.id_post" effect="dark" placement="top">
-								<el-link target="_blank" :href="'http://103.226.249.122:8080/api/save/view?id_post='+scope.row.id_post" type="primary" :underline="true" :disabled="false">
+								<el-link target="_blank" :href="'http://localhost:8080/api/save/view?id_post='+scope.row.id_post" type="primary" :underline="true" :disabled="false">
 									{{scope.row.content.length > 120 ? scope.row.content.slice(0,120)+'...' : scope.row.content}}
 								</el-link>
 							</el-tooltip>
@@ -143,7 +143,7 @@
 				return time;
 			},
 			async remove_post(data){
-				await this.$axios.delete('http://103.226.249.122:8080/api/post/'+data.id);
+				await this.$axios.delete('http://localhost:8080/api/post/'+data.id);
 				this.posts = this.posts.filter(e=>e.id !== data.id);
 
 			},
@@ -155,7 +155,7 @@
 				this.persons = [];
 				this.loading = true;
 				row.like_visible = true;
-				let {data} = await this.$axios.post('http://103.226.249.122:8080/api/post/get-uid-like',{id_post:row.id_post,cookie:this.cookie});
+				let {data} = await this.$axios.post('http://localhost:8080/api/post/get-uid-like',{id_post:row.id_post,cookie:this.cookie});
 				this.loading = false;
 				this.persons = data;
 
@@ -167,7 +167,7 @@
 				this.persons = [];
 				this.loading = true;
 				row.comment_visible = true;
-				let {data} = await this.$axios.post('http://103.226.249.122:8080/api/post/get-uid-comment',{id_post:row.id_post,cookie:this.cookie});
+				let {data} = await this.$axios.post('http://localhost:8080/api/post/get-uid-comment',{id_post:row.id_post,cookie:this.cookie});
 				this.loading = false;
 				this.persons = data;
 			},
@@ -177,7 +177,7 @@
 			async refresh(){
 				let where = {};
 				if(this.start && this.end) where.time = {'>':this.start,'<':this.end};
-				let {data} = await this.$axios.get('http://103.226.249.122:8080/api/post',{params:{where}});
+				let {data} = await this.$axios.get('http://localhost:8080/api/post',{params:{where}});
 				data = data.map(e=>{
 					e.like_visible = false;
 					e.comment_visible = false;

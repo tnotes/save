@@ -114,7 +114,7 @@
 				this.loading = true;
 				for(let {url,cookie} of this.data){
 					this.running.push({url,cookie,status:1,id:null});
-					let {data} = await this.$axios.post('http://103.226.249.122:8080/api/save/add',{url,cookie});
+					let {data} = await this.$axios.post('http://localhost:8080/api/save/add',{url,cookie});
 					if(url.includes('facebook.com')){
 						let id_post = this.filter_facebook_link(url);
 						if(id_post) await this.facebook_post(id_post,cookie);
@@ -129,19 +129,40 @@
 				
 			},
 			async facebook_post(id_post,cookie){
-				await this.$axios.post('http://103.226.249.122:8080/api/post/info',{id_post,cookie})
+				await this.$axios.post('http://localhost:8080/api/post/info',{id_post,cookie})
 			},
 			filter_facebook_link(url){
 				
 				let id_post = null;
-				let case_group = url.includes('facebook.com/groups') && url.includes('permalink');
-				let case_page = url.includes('facebook.com') && url.includes('/posts/');
-				let case_timeline = url.includes('facebook.com/permalink.php?story_fbid=') || url.includes('facebook.com/photo.php?fbid=') || url.includes('facebook.com') && url.includes('/posts/');
+				
+				let case_group = url.includes('facebook.com/groups') && url.includes('/permalink/');
 
-				if(case_group) id_post = url.match(/(?<=\/permalink\/+).*?(?=\/)/gs)[0];
-				if(case_page) id_post = url.match(/(?<=\/posts\/+).*?(?=\?)/gs)[0];
+				let case_page_post = url.includes('facebook.com') && url.includes('/posts/');
+				let case_page_photos = url.includes('facebook.com') && url.includes('/photos/');
+				let case_page_video = url.includes('facebook.com') && url.includes('/videos/');
+
+				let case_timeline_photo = url.includes('facebook.com') && url.includes('photo.php?fbid=');
+
+
+				if(case_timeline_photo) {
+					
+					id_post = url.match(new RegExp('(?<='+'fbid\='+'+).*?(?='+'\&'+')',"gs"))[0];
+					
+				}else if(case_group){
+					id_post = (url.slice(-1) === '/') ? url.match(/(?<=\/permalink\/+).*?(?=\/)/gs)[0] : url.slice(url.indexOf('/permalink/') + 11);
+					if(id_post.includes('?')) id_post = id_post.slice(0,id_post.indexOf('?'))
+				}else if(case_page_post){
+					id_post = (url.slice(-1) === '/') ? url.match(/(?<=\/posts\/+).*?(?=\?)/gs)[0] : url.slice(url.indexOf('/posts/')+7);
+					if(id_post.includes('?')) id_post = id_post.slice(0,id_post.indexOf('?'))
+				}else if(case_page_photos){
+					id_post = url.slice(url.indexOf('facebook.com')).split('/')[4];
+				}else if(case_page_video){
+					id_post = url.slice(url.indexOf('facebook.com')).split('/')[3];
+				}
+				
 				return id_post;
 			},
+
 			
 			remove_origin(origin){
 				this.link = this.link.split('\n').filter(e=>!e.includes(origin)).join('\n');
